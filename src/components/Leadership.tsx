@@ -4,7 +4,7 @@ import { Mail, Award } from 'lucide-react';
 const Leadership = () => {
   const president = {
     id: 1,
-    name: 'Alex Mukwaya',
+    name: 'H.E ZIMULA FARID',
     position: 'President',
     year: 'Year 4',
     course: 'Computer Science',
