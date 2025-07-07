@@ -138,7 +138,7 @@ const Footer = () => {
             {/* Copyright */}
             <div className="text-sm text-blue-100">
               <p>© {currentYear} KYUCSA - Kyambogo University Computing Students Association.</p>
-              <p className="mt-1">All rights reserved. Built with ❤️ by KYUCSA Tech Team.</p>
+              <p className="mt-1">All rights reserved. Developed and Modified by KYUCSA Executives 2025-2026.</p>
             </div>
 
             {/* Footer Links */}

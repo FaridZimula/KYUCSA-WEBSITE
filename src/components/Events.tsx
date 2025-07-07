@@ -29,7 +29,7 @@ const Events = () => {
       attendees: 45,
       maxAttendees: 60,
       category: 'Workshop',
-      flyer: 'https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=600',
+      flyer: '',
       instructor: 'David Ssemakula'
     },
     {
@@ -42,7 +42,7 @@ const Events = () => {
       attendees: 38,
       maxAttendees: 50,
       category: 'Training',
-      flyer: 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600',
+      flyer: '',
       instructor: 'Sarah Nakato'
     },
     {
@@ -55,7 +55,7 @@ const Events = () => {
       attendees: 52,
       maxAttendees: 70,
       category: 'Workshop',
-      flyer: 'https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?auto=compress&cs=tinysrgb&w=600',
+      flyer: '',
       instructor: 'Grace Namusoke'
     },
     {
@@ -68,7 +68,7 @@ const Events = () => {
       attendees: 67,
       maxAttendees: 80,
       category: 'Seminar',
-      flyer: 'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=600',
+      flyer: '',
       instructor: 'Alex Mukwaya'
     },
     {
@@ -81,7 +81,7 @@ const Events = () => {
       attendees: 41,
       maxAttendees: 55,
       category: 'Training',
-      flyer: 'https://images.pexels.com/photos/60504/security-protection-anti-virus-software-60504.jpeg?auto=compress&cs=tinysrgb&w=600',
+      flyer: '',
       instructor: 'Maria Nassali'
     },
     {
@@ -94,7 +94,7 @@ const Events = () => {
       attendees: 33,
       maxAttendees: 45,
       category: 'Workshop',
-      flyer: 'https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=600',
+      flyer: '',
       instructor: 'Peter Kiggundu'
     }
   ];
@@ -110,7 +110,7 @@ const Events = () => {
       attendees: 245,
       maxAttendees: 300,
       category: 'Conference',
-      flyer: 'https://images.pexels.com/photos/2608517/pexels-photo-2608517.jpeg?auto=compress&cs=tinysrgb&w=600'
+      flyer: ''
     },
     {
       id: 8,
@@ -122,7 +122,7 @@ const Events = () => {
       attendees: 89,
       maxAttendees: 120,
       category: 'Competition',
-      flyer: 'https://images.pexels.com/photos/3861958/pexels-photo-3861958.jpeg?auto=compress&cs=tinysrgb&w=600'
+      flyer: ''
     },
     {
       id: 9,
@@ -134,7 +134,7 @@ const Events = () => {
       attendees: 156,
       maxAttendees: 200,
       category: 'Career',
-      flyer: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600'
+      flyer: ''
     },
     {
       id: 10,
@@ -146,7 +146,7 @@ const Events = () => {
       attendees: 78,
       maxAttendees: 100,
       category: 'Meeting',
-      flyer: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600'
+      flyer: ''
     }
   ];
 
