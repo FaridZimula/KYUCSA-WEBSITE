@@ -6,7 +6,7 @@ const Footer = () => {
 
   const quickLinks = [
     { name: 'About KYUCSA', href: '#about' },
-    { name: 'Course Notes', href: '#notes' },
+    { name: 'Academic Resources', href: '#notes' },
     { name: 'Student Projects', href: '#projects' },
     { name: 'Leadership Team', href: '#leadership' },
     { name: 'Events Calendar', href: '#events' },

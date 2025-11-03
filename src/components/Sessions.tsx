@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, MapPin, Clock, Users, BookOpen, Video } from 'lucide-react';
 import { eventsManager, sessionsManager, Event, Session } from '../utils/dataManager';
 
-const Events = () => {
+const Sessions: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [activeTab, setActiveTab] = useState<'all' | 'sessions' | 'events'>('all');
@@ -231,4 +231,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default Sessions;

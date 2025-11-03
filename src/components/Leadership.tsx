@@ -1,8 +1,21 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Award } from 'lucide-react';
+import { leadershipManager, LeadershipMember } from '../utils/dataManager';
 
 const Leadership = () => {
-  const president = {
+  const [president, setPresident] = useState<LeadershipMember | null>(null);
+  const [executives, setExecutives] = useState<LeadershipMember[]>([]);
+
+  useEffect(() => {
+    loadLeadership();
+  }, []);
+
+  const loadLeadership = () => {
+    const data = leadershipManager.getAll();
+    
+    // Initialize with default data if empty
+    if (!data.president) {
+      const defaultPresident: LeadershipMember = {
     id: 1,
     name: 'H.E ZIMULA FARID',
     position: 'President',
@@ -248,6 +261,11 @@ const Leadership = () => {
     },
   ];
 
+      setPresident(defaultPresident);
+      setExecutives(otherExecutives);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Blue Header Section */}
@@ -264,58 +282,60 @@ const Leadership = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
         {/* President Section - Larger and Prominent */}
-        <div className="mb-12 sm:mb-16">
-          <div className="max-w-5xl mx-auto">
-            <div className="bg-white border-2 border-primary-200 rounded-2xl overflow-hidden shadow-xl">
-              <div className="grid md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8">
-                <div className="aspect-square bg-gray-200 overflow-hidden rounded-xl">
-                  <img 
-                    src={president.image} 
-                    alt={president.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                
-                <div className="flex flex-col justify-center">
-                  <div className="mb-4 sm:mb-6 text-center md:text-left">
-                    <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{president.name}</h3>
-                    <p className="text-xl sm:text-2xl font-semibold text-primary-500 mb-2">{president.position}</p>
-                    <p className="text-base sm:text-lg text-gray-600">{president.year} • {president.course}</p>
+        {president && (
+          <div className="mb-12 sm:mb-16">
+            <div className="max-w-5xl mx-auto">
+              <div className="bg-white border-2 border-primary-200 rounded-2xl overflow-hidden shadow-xl">
+                <div className="grid md:grid-cols-2 gap-6 sm:gap-8 p-6 sm:p-8">
+                  <div className="aspect-square bg-gray-200 overflow-hidden rounded-xl">
+                    <img 
+                      src={president.image} 
+                      alt={president.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   
-                  <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6 leading-relaxed text-center md:text-left">{president.bio}</p>
-                  
-                  {/* Achievements */}
-                  <div className="mb-4 sm:mb-6">
-                    <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 flex items-center justify-center md:justify-start">
-                      <Award className="h-4 sm:h-5 w-4 sm:w-5 mr-2 text-secondary-500" />
-                      Key Achievements
-                    </h4>
-                    <div className="space-y-2">
-                      {president.achievements.map((achievement, index) => (
-                        <p key={index} className="text-xs sm:text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg text-center md:text-left">
-                          {achievement}
-                        </p>
-                      ))}
+                  <div className="flex flex-col justify-center">
+                    <div className="mb-4 sm:mb-6 text-center md:text-left">
+                      <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">{president.name}</h3>
+                      <p className="text-xl sm:text-2xl font-semibold text-primary-500 mb-2">{president.position}</p>
+                      <p className="text-base sm:text-lg text-gray-600">{president.year} • {president.course}</p>
                     </div>
-                  </div>
-                  
-                  {/* Contact Information */}
-                  <div className="flex items-center justify-center md:justify-start text-gray-600">
-                    <Mail className="h-4 sm:h-5 w-4 sm:w-5 mr-3 text-primary-500 flex-shrink-0" />
-                    <a href={`mailto:${president.email}`} className="hover:text-primary-500 transition-colors text-sm sm:text-base break-all">
-                      {president.email}
-                    </a>
+                    
+                    <p className="text-sm sm:text-base text-gray-700 mb-4 sm:mb-6 leading-relaxed text-center md:text-left">{president.bio}</p>
+                    
+                    {/* Achievements */}
+                    <div className="mb-4 sm:mb-6">
+                      <h4 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 flex items-center justify-center md:justify-start">
+                        <Award className="h-4 sm:h-5 w-4 sm:w-5 mr-2 text-secondary-500" />
+                        Key Achievements
+                      </h4>
+                      <div className="space-y-2">
+                        {president.achievements.map((achievement: string, index: number) => (
+                          <p key={index} className="text-xs sm:text-sm text-gray-600 bg-gray-50 px-3 py-2 rounded-lg text-center md:text-left">
+                            {achievement}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Contact Information */}
+                    <div className="flex items-center justify-center md:justify-start text-gray-600">
+                      <Mail className="h-4 sm:h-5 w-4 sm:w-5 mr-3 text-primary-500 flex-shrink-0" />
+                      <a href={`mailto:${president.email}`} className="hover:text-primary-500 transition-colors text-sm sm:text-base break-all">
+                        {president.email}
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Other Executive Members */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          {otherExecutives.map((executive) => (
+          {executives.map((executive: LeadershipMember) => (
             <div key={executive.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-200">
               <div className="aspect-square bg-gray-200 overflow-hidden">
                 <img 
@@ -341,7 +361,7 @@ const Leadership = () => {
                     Achievements
                   </h4>
                   <div className="space-y-1">
-                    {executive.achievements.slice(0, 2).map((achievement, index) => (
+                    {executive.achievements.slice(0, 2).map((achievement: string, index: number) => (
                       <p key={index} className="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded text-center line-clamp-1">
                         {achievement}
                       </p>

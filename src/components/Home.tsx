@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Users, BookOpen, Trophy, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Users, BookOpen, Trophy, Calendar } from 'lucide-react';
 
 interface HeroProps {
   setCurrentPage: (page: string) => void;
@@ -9,6 +9,7 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
   const [showFullMessage, setShowFullMessage] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentSessionSlide, setCurrentSessionSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const sessionImages = [
     '/Home Slide 3 (1).jpg',
@@ -35,20 +36,29 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
   }, [backgroundImages.length]);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  useEffect(() => {
     const sessionInterval = setInterval(() => {
-      setCurrentSessionSlide((prev) => (prev + 1) % sessionImages.length);
+      setCurrentSessionSlide((prev) => {
+        // On mobile, show 2 images; on desktop, show 4 images
+        const maxSlide = isMobile 
+          ? Math.max(0, sessionImages.length - 2)
+          : Math.max(0, sessionImages.length - 4);
+        return prev >= maxSlide ? 0 : prev + 1;
+      });
     }, 4000);
 
     return () => clearInterval(sessionInterval);
-  }, [sessionImages.length]);
-
-  const nextSessionSlide = () => {
-    setCurrentSessionSlide((prev) => (prev + 1) % sessionImages.length);
-  };
-
-  const prevSessionSlide = () => {
-    setCurrentSessionSlide((prev) => (prev - 1 + sessionImages.length) % sessionImages.length);
-  };
+  }, [sessionImages.length, isMobile]);
 
   const fullMessage = `Welcome to KYUCSA, where innovation meets opportunity. As your president, I'm excited to 
   lead an organization that has consistently championed academic excellence and professional 
@@ -113,7 +123,10 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
                 collaborative learning, and professional growth in the world of computing.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button className="bg-secondary-500 hover:bg-secondary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center group">
+                <button 
+                  onClick={() => setCurrentPage('notes')}
+                  className="bg-secondary-500 hover:bg-secondary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center group"
+                >
                   Explore Resources
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </button>
@@ -132,7 +145,7 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
               <div className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20">
                 <BookOpen className="h-6 lg:h-8 w-6 lg:w-8 text-secondary-500 mb-4" />
                 <h3 className="text-base lg:text-lg font-semibold mb-2">Study Resources</h3>
-                <p className="text-sm lg:text-base text-blue-100">Access notes and question banks</p>
+                <p className="text-sm lg:text-base text-blue-100">Access academic resources and question banks</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20">
                 <Trophy className="h-6 lg:h-8 w-6 lg:w-8 text-secondary-500 mb-4" />
@@ -166,12 +179,14 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
             <div className="overflow-hidden">
               <div 
                 className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentSessionSlide * (100 / 4)}%)` }}
+                style={{ 
+                  transform: `translateX(-${currentSessionSlide * (isMobile ? 50 : 25)}%)` 
+                }}
               >
                 {sessionImages.map((image, index) => (
                   <div
                     key={index}
-                    className="flex-shrink-0 w-1/4 px-2"
+                    className="flex-shrink-0 w-1/2 sm:w-1/4 px-2"
                   >
                     <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md">
                       <img 
@@ -184,42 +199,63 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
                 ))}
               </div>
             </div>
-            
-            {/* Navigation Arrows */}
-            <button
-              onClick={prevSessionSlide}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 z-10"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </button>
-            <button
-              onClick={nextSessionSlide}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 rounded-full transition-all duration-200 z-10"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </button>
-            
-            {/* Slide Indicators */}
-            <div className="flex justify-center mt-4 space-x-2">
-              {sessionImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSessionSlide(index)}
-                  className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-colors duration-200 ${
-                    index === currentSessionSlide ? 'bg-primary-500' : 'bg-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
           </div>
 
           <div className="text-center">
             <button 
               onClick={() => setCurrentPage('events')}
-              className="bg-secondary-500 hover:bg-secondary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors duration-200"
+              className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg font-semibold transition-colors duration-200"
             >
               View All Our Sessions
             </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Partners Section */}
+      <section className="py-12 sm:py-20 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Our Partners
+            </h2>
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto">
+              Trusted by leading technology companies and organizations
+            </p>
+          </div>
+
+          {/* Infinite Scrolling Logo Carousel */}
+          <div className="relative">
+            <div className="overflow-hidden">
+              <div className="flex animate-scroll-slow">
+                {/* First set of logos */}
+                {[...Array(2)].map((_, setIndex) => (
+                  <div key={setIndex} className="flex flex-shrink-0">
+                    {[
+                      { name: 'Tech Company 1', logo: 'https://via.placeholder.com/200x100/2563eb/ffffff?text=Partner+1' },
+                      { name: 'Tech Company 2', logo: 'https://via.placeholder.com/200x100/7c3aed/ffffff?text=Partner+2' },
+                      { name: 'Tech Company 3', logo: 'https://via.placeholder.com/200x100/dc2626/ffffff?text=Partner+3' },
+                      { name: 'Tech Company 4', logo: 'https://via.placeholder.com/200x100/059669/ffffff?text=Partner+4' },
+                      { name: 'Tech Company 5', logo: 'https://via.placeholder.com/200x100/ea580c/ffffff?text=Partner+5' },
+                      { name: 'Tech Company 6', logo: 'https://via.placeholder.com/200x100/be185d/ffffff?text=Partner+6' },
+                    ].map((partner, index) => (
+                      <div
+                        key={`${setIndex}-${index}`}
+                        className="flex-shrink-0 mx-4 sm:mx-8 w-32 sm:w-40 lg:w-48 h-20 sm:h-24 lg:h-28"
+                      >
+                        <div className="w-full h-full bg-white rounded-lg shadow-md p-4 flex items-center justify-center border border-gray-200 hover:shadow-lg transition-shadow duration-300">
+                          <img
+                            src={partner.logo}
+                            alt={partner.name}
+                            className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

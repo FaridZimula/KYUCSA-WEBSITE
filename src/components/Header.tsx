@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 
 interface HeaderProps {
@@ -12,9 +12,10 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
   const navItems = [
     { name: 'Home', id: 'home' },
     { name: 'About Us', id: 'about' },
-    { name: 'Notes', id: 'notes' },
+    { name: 'Academic Resources', id: 'notes' },
     { name: 'Projects', id: 'projects' },
     { name: 'Leadership', id: 'leadership' },
+    { name: 'Sessions', id: 'sessions' },
     { name: 'Sessions & Events', id: 'events' },
     { name: 'Contact Us', id: 'contact' },
   ];
@@ -27,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-4 relative">
           {/* Logo Space - Ready for image replacement */}
           <div 
             className="flex items-center cursor-pointer"
@@ -51,13 +52,13 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden xl:flex space-x-6">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden xl:flex items-center space-x-2 absolute left-1/2 transform -translate-x-1/2">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`font-medium transition-colors duration-200 text-sm whitespace-nowrap ${
+                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1.5 ${
                   currentPage === item.id
                     ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
                     : 'text-gray-700 hover:text-primary-500'
@@ -68,13 +69,16 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
             ))}
           </nav>
 
+          {/* Desktop Spacer (for balance) */}
+          <div className="hidden xl:block flex-shrink-0"></div>
+
           {/* Tablet Navigation */}
-          <nav className="hidden lg:flex xl:hidden space-x-4">
-            {navItems.slice(0, 5).map((item) => (
+          <nav className="hidden lg:flex xl:hidden items-center space-x-2 flex-1 ml-4">
+            {navItems.slice(0, 2).map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap ${
+                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
                   currentPage === item.id
                     ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
                     : 'text-gray-700 hover:text-primary-500'
@@ -83,14 +87,58 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
                 {item.name}
               </button>
             ))}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 hover:text-primary-500 transition-colors"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+            {/* Show Leadership prominently on tablet */}
+            {navItems.filter(item => item.id === 'leadership').map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
+                  currentPage === item.id
+                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
+                    : 'text-gray-700 hover:text-primary-500'
+                }`}
+              >
+                {item.name}
+              </button>
+            ))}
+            {/* Show Sessions prominently on tablet */}
+            {navItems.filter(item => item.id === 'sessions').map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
+                  currentPage === item.id
+                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
+                    : 'text-gray-700 hover:text-primary-500'
+                }`}
+              >
+                {item.name}
+              </button>
+            ))}
+            {/* Show Contact Us prominently on tablet */}
+            {navItems.filter(item => item.id === 'contact').map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
+                  currentPage === item.id
+                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
+                    : 'text-gray-700 hover:text-primary-500'
+                }`}
+              >
+                {item.name}
+              </button>
+            ))}
           </nav>
 
+          {/* Menu Button (Tablet and Mobile) - at extreme right */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="hidden lg:flex xl:hidden p-2 rounded-md text-gray-700 hover:text-primary-500 transition-colors"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}

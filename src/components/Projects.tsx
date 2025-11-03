@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ExternalLink, Star, Eye, Users } from 'lucide-react';
+import { projectsManager, Project } from '../utils/dataManager';
 
 const Projects = () => {
   const [filter, setFilter] = useState('all');
+  const [projects, setProjects] = useState<Project[]>([]);
 
-  const projects = [
+  // Default projects if localStorage is empty (for initial setup)
+  const defaultProjects: Project[] = [
     {
       id: 1,
       title: 'University Management System',
@@ -90,6 +93,23 @@ const Projects = () => {
       projectUrl: '#'
     }
   ];
+
+  const loadProjects = () => {
+    const data = projectsManager.getAll();
+    setProjects(data);
+  };
+
+  useEffect(() => {
+    loadProjects();
+    // Initialize with default projects if empty
+    const currentProjects = projectsManager.getAll();
+    if (currentProjects.length === 0 && defaultProjects.length > 0) {
+      defaultProjects.forEach(project => {
+        projectsManager.add(project);
+      });
+      loadProjects();
+    }
+  }, []);
 
   const categories = [
     { id: 'all', name: 'All Projects', count: projects.length },

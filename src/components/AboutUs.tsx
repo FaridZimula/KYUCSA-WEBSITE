@@ -1,6 +1,5 @@
 import React from 'react';
-import { Users, Target, Handshake, Calendar, Award, BookOpen, Briefcase, Globe } from 'lucide-react';
-
+import { Users, Target, Calendar, Award, BookOpen, Briefcase, Globe } from 'lucide-react';
 interface AboutUsProps {
   setCurrentPage: (page: string) => void;
 }
@@ -10,7 +9,7 @@ const AboutUs: React.FC<AboutUsProps> = ({ setCurrentPage }) => {
     {
       icon: BookOpen,
       title: 'Academic Excellence',
-      description: 'Access to comprehensive study materials, notes, and question banks for all computing courses.',
+      description: 'Access to comprehensive study materials, academic resources, and question banks for all computing courses.',
       color: 'blue' // Blue theme
     },
     {

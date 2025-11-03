@@ -290,10 +290,10 @@ const Notes: React.FC<NotesProps> = ({ setCurrentPage }) => {
       <div className="bg-primary-500 text-white py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
-            Course Notes & Question Banks
+            Academic Resources
           </h1>
           <p className="text-lg sm:text-xl text-blue-100 max-w-3xl mx-auto">
-            Access comprehensive study materials organized by program and year of study
+            Access comprehensive study materials, course notes, and question banks organized by program and year of study
           </p>
         </div>
       </div>
@@ -417,14 +417,14 @@ const Notes: React.FC<NotesProps> = ({ setCurrentPage }) => {
         <div className="mt-12 bg-primary-500 rounded-2xl p-6 sm:p-8 text-center text-white">
           <h3 className="text-xl sm:text-2xl font-bold mb-4">Can't find what you're looking for?</h3>
           <p className="text-sm sm:text-base text-blue-100 mb-6">
-            Request specific notes or contribute your own study materials to help fellow students.
+            Request specific academic resources or contribute your own study materials to help fellow students.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
               onClick={() => setCurrentPage('contact')}
               className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition-colors duration-200 text-sm sm:text-base"
             >
-              Request Notes
+              Request Resources
             </button>
             <button 
               onClick={() => setCurrentPage('contact')}
