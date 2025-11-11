@@ -232,12 +232,16 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
                 {[...Array(2)].map((_, setIndex) => (
                   <div key={setIndex} className="flex flex-shrink-0">
                     {[
-                      { name: 'Tech Company 1', logo: 'https://via.placeholder.com/200x100/2563eb/ffffff?text=Partner+1' },
-                      { name: 'Tech Company 2', logo: 'https://via.placeholder.com/200x100/7c3aed/ffffff?text=Partner+2' },
-                      { name: 'Tech Company 3', logo: 'https://via.placeholder.com/200x100/dc2626/ffffff?text=Partner+3' },
-                      { name: 'Tech Company 4', logo: 'https://via.placeholder.com/200x100/059669/ffffff?text=Partner+4' },
-                      { name: 'Tech Company 5', logo: 'https://via.placeholder.com/200x100/ea580c/ffffff?text=Partner+5' },
-                      { name: 'Tech Company 6', logo: 'https://via.placeholder.com/200x100/be185d/ffffff?text=Partner+6' },
+                      { name: 'Tech Company 1', logo: '/Hostel Connect logo.jpg' },
+                      { name: 'Tech Company 2', logo: '/FLAMIA LOGO.png' },
+                      { name: 'Tech Company 3', logo: '/Tamu Graphics.png' },
+                      { name: 'Tech Company 4', logo: '/Tamu Store Lopgo.png' },
+                      { name: 'Tech Company 5', logo: '/Tamu Web Logo 2.png' },
+                      { name: 'Tech Company 6', logo: '/KYU LOGO 3.png' },
+                      { name: 'Tech Company 3', logo: '/1719928495036.jpeg' },
+                      { name: 'Tech Company 4', logo: '/download (8).png' },
+                      { name: 'Tech Company 5', logo: '/download (39).jpeg' },
+                      { name: 'Tech Company 6', logo: '/Policy.jpg' },
                     ].map((partner, index) => (
                       <div
                         key={`${setIndex}-${index}`}
