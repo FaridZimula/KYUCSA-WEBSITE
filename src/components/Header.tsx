@@ -53,14 +53,14 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
           </div>
 
           {/* Desktop Navigation - Centered */}
-          <nav className="hidden xl:flex items-center space-x-2 absolute left-1/2 transform -translate-x-1/2">
+          <nav className="hidden xl:flex items-center space-x-4 absolute left-1/2 transform -translate-x-1/2">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1.5 ${
+                className={`font-medium transition-colors duration-200 text-sm whitespace-nowrap px-2 py-1 ${
                   currentPage === item.id
-                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
+                    ? 'text-primary-500 border-b-2 border-primary-500'
                     : 'text-gray-700 hover:text-primary-500'
                 }`}
               >
@@ -73,56 +73,14 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
           <div className="hidden xl:block flex-shrink-0"></div>
 
           {/* Tablet Navigation */}
-          <nav className="hidden lg:flex xl:hidden items-center space-x-2 flex-1 ml-4">
-            {navItems.slice(0, 2).map((item) => (
+          <nav className="hidden lg:flex xl:hidden items-center space-x-3 flex-1 ml-4 overflow-x-auto">
+            {navItems.slice(0, 5).map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item.id)}
-                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
+                className={`font-medium transition-colors duration-200 text-sm whitespace-nowrap px-2 py-1 ${
                   currentPage === item.id
-                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
-                    : 'text-gray-700 hover:text-primary-500'
-                }`}
-              >
-                {item.name}
-              </button>
-            ))}
-            {/* Show Leadership prominently on tablet */}
-            {navItems.filter(item => item.id === 'leadership').map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
-                  currentPage === item.id
-                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
-                    : 'text-gray-700 hover:text-primary-500'
-                }`}
-              >
-                {item.name}
-              </button>
-            ))}
-            {/* Show Sessions prominently on tablet */}
-            {navItems.filter(item => item.id === 'sessions').map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
-                  currentPage === item.id
-                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
-                    : 'text-gray-700 hover:text-primary-500'
-                }`}
-              >
-                {item.name}
-              </button>
-            ))}
-            {/* Show Contact Us prominently on tablet */}
-            {navItems.filter(item => item.id === 'contact').map((item) => (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`font-medium transition-colors duration-200 text-xs whitespace-nowrap px-1 ${
-                  currentPage === item.id
-                    ? 'text-primary-500 border-b-2 border-primary-500 pb-1'
+                    ? 'text-primary-500 border-b-2 border-primary-500'
                     : 'text-gray-700 hover:text-primary-500'
                 }`}
               >
