@@ -35,10 +35,10 @@ const ContactUs = () => {
         `Message:%0D%0A${encodeURIComponent(formData.message)}`;
 
       const mailtoLink = `mailto:info@kyucsa.org?subject=${encodeURIComponent(formData.subject)}&body=${emailBody}`;
-      
+
       // Open default email client
       window.location.href = mailtoLink;
-      
+
       // Reset form after a short delay
       setTimeout(() => {
         setFormData({
@@ -69,8 +69,17 @@ const ContactUs = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Blue Header Section */}
-      <div className="bg-primary-500 text-white py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="bg-primary-500 text-white py-16 sm:py-20 relative overflow-hidden">
+        {/* Background Image Overlay */}
+        <div className="absolute inset-0">
+          <img
+            src="/Home Slide 7.jpg"
+            alt="Background"
+            className="w-full h-full object-cover opacity-10"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
             Get in Touch
           </h1>
@@ -210,7 +219,7 @@ const ContactUs = () => {
                 <Send className="h-5 w-5 mr-2" />
                 Send us a Message
               </h3>
-              
+
               {submitStatus === 'success' && (
                 <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
                   <p className="text-sm">✓ Your email client should open. If not, please email us directly at info@kyucsa.org</p>
@@ -222,7 +231,7 @@ const ContactUs = () => {
                   <p className="text-sm">There was an error. Please try again or email us directly at info@kyucsa.org</p>
                 </div>
               )}
-              
+
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                 <div>
                   <label htmlFor="name" className="block text-white font-medium mb-2 text-sm sm:text-base">

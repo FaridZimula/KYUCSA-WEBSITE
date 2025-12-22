@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code, Mail, MapPin, Facebook, Twitter, Instagram, Linkedin, Github, ExternalLink } from 'lucide-react';
+import { Code, Mail, MapPin, Twitter, Instagram, Linkedin, Youtube, ExternalLink, MessageCircle } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -23,11 +23,11 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { name: 'Facebook', icon: Facebook, href: 'https://facebook.com/kyucsa', color: 'hover:text-blue-400' },
-    { name: 'Twitter', icon: Twitter, href: 'https://twitter.com/kyucsa', color: 'hover:text-blue-300' },
-    { name: 'Instagram', icon: Instagram, href: 'https://instagram.com/kyucsa', color: 'hover:text-pink-400' },
-    { name: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/company/kyucsa', color: 'hover:text-blue-300' },
-    { name: 'GitHub', icon: Github, href: 'https://github.com/kyucsa', color: 'hover:text-gray-300' }
+    { name: 'Instagram', icon: Instagram, href: 'https://www.instagram.com/kyucsa.scis?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==', color: 'hover:text-pink-400' },
+    { name: 'WhatsApp', icon: MessageCircle, href: 'https://whatsapp.com/channel/0029VakvhYu1CYoORf4ySo1D', color: 'hover:text-green-500' },
+    { name: 'YouTube', icon: Youtube, href: 'https://www.youtube.com/@KYUCSA-1', color: 'hover:text-red-500' },
+    { name: 'LinkedIn', icon: Linkedin, href: 'https://www.linkedin.com/posts/kyucsa-kyambogo-university-computing-students-association_kyambogo-well-represented-kyucsa-well-activity-7394633774057271296-18Ft?utm_source=share&utm_medium=member_desktop&rcm=ACoAAF-RgigBVipczroqeP2nBaUXG2v2cL0QZSU', color: 'hover:text-blue-300' },
+    { name: 'X', icon: Twitter, href: 'https://x.com/kyucsa_scis?s=20', color: 'hover:text-gray-300' }
   ];
 
   return (
@@ -35,7 +35,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
-          
+
           {/* Organization Info */}
           <div className="lg:col-span-1 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
@@ -48,10 +48,10 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-blue-100 mb-6 leading-relaxed text-center md:text-left">
-              Empowering computing students at Kyambogo University through academic excellence, 
+              Empowering computing students at Kyambogo University through academic excellence,
               professional development, and community building.
             </p>
-            
+
             {/* Contact Info */}
             <div className="space-y-3 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start space-x-3">
@@ -73,8 +73,8 @@ const Footer = () => {
             <ul className="space-y-2">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  <a 
-                    href={link.href} 
+                  <a
+                    href={link.href}
                     className="text-blue-100 hover:text-white transition-colors duration-200 flex items-center justify-center md:justify-start group"
                   >
                     <span>{link.name}</span>
@@ -91,8 +91,8 @@ const Footer = () => {
             <ul className="space-y-2">
               {resources.map((resource) => (
                 <li key={resource.name}>
-                  <a 
-                    href={resource.href} 
+                  <a
+                    href={resource.href}
                     className="text-blue-100 hover:text-white transition-colors duration-200 flex items-center justify-center md:justify-start group"
                   >
                     <span>{resource.name}</span>
@@ -134,7 +134,7 @@ const Footer = () => {
         {/* Divider */}
         <div className="border-t border-primary-400 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 text-center md:text-left">
-            
+
             {/* Copyright */}
             <div className="text-sm text-blue-100">
               <p>© {currentYear} KYUCSA - Kyambogo University Computing Students Association.</p>

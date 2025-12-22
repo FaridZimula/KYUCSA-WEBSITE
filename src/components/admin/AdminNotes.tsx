@@ -6,6 +6,7 @@ const AdminNotes: React.FC = () => {
   const [notes, setNotes] = useState<Record<string, Record<string, Note[]>>>({});
   const [selectedCategory, setSelectedCategory] = useState<'bitc' | 'bis' | 'blis' | 'cs'>('bitc');
   const [selectedYear, setSelectedYear] = useState<'year1' | 'year2' | 'year3'>('year1');
+  const [selectedSemester, setSelectedSemester] = useState<'semester1' | 'semester2'>('semester1');
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState<Partial<Note>>({
@@ -15,14 +16,15 @@ const AdminNotes: React.FC = () => {
     downloads: 0,
     category: 'bitc',
     year: 'year1',
+    semester: 'semester1',
   });
 
   useEffect(() => {
     loadNotes();
   }, []);
 
-  const loadNotes = () => {
-    const data = notesManager.getAll();
+  const loadNotes = async () => {
+    const data = await notesManager.getAll();
     setNotes(data);
   };
 
@@ -39,7 +41,13 @@ const AdminNotes: React.FC = () => {
     { id: 'year3' as const, name: 'Year 3' },
   ];
 
-  const currentNotes = notes[selectedCategory]?.[selectedYear] || [];
+  const semesters = [
+    { id: 'semester1' as const, name: 'Semester 1' },
+    { id: 'semester2' as const, name: 'Semester 2' },
+  ];
+
+  const allYearNotes = notes[selectedCategory]?.[selectedYear] || [];
+  const currentNotes = allYearNotes.filter(n => n.semester === selectedSemester || !n.semester); // Show if match or undefined (legacy)
 
   const handleAdd = () => {
     setFormData({
@@ -49,6 +57,7 @@ const AdminNotes: React.FC = () => {
       downloads: 0,
       category: selectedCategory,
       year: selectedYear,
+      semester: selectedSemester,
     });
     setEditingNote(null);
     setShowForm(true);
@@ -60,14 +69,19 @@ const AdminNotes: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this note?')) {
-      notesManager.delete(selectedCategory, selectedYear, id);
-      loadNotes();
+      try {
+        await notesManager.delete(id);
+        await loadNotes();
+      } catch (error) {
+        console.error("Failed to delete note:", error);
+        alert("Failed to delete note. Check console for details.");
+      }
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name || !formData.size) {
       alert('Please fill in all required fields');
       return;
@@ -81,18 +95,26 @@ const AdminNotes: React.FC = () => {
       downloads: formData.downloads || 0,
       category: formData.category || selectedCategory,
       year: formData.year || selectedYear,
+      semester: formData.semester || selectedSemester,
+      url: formData.url,
+      fileData: formData.fileData,
     };
 
-    if (editingNote) {
-      notesManager.update(noteData);
-    } else {
-      notesManager.add(noteData);
-    }
+    try {
+      if (editingNote) {
+        await notesManager.update(noteData);
+      } else {
+        await notesManager.add(noteData);
+      }
 
-    loadNotes();
-    setShowForm(false);
-    setEditingNote(null);
-    setFormData({ name: '', type: 'PDF', size: '', downloads: 0 });
+      await loadNotes();
+      setShowForm(false);
+      setEditingNote(null);
+      setFormData({ name: '', type: 'PDF', size: '', downloads: 0 });
+    } catch (error) {
+      console.error("Failed to save note:", error);
+      alert("Failed to save note. If you are uploading a file, ensure it is within the database limits (usually < 1MB for direct storage) or try using a URL instead. Error details in console.");
+    }
   };
 
   const handleCancel = () => {
@@ -103,7 +125,7 @@ const AdminNotes: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="flex flex-col items-center gap-4 text-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Notes Management</h2>
           <p className="text-gray-600">Manage course notes and documents</p>
@@ -119,7 +141,7 @@ const AdminNotes: React.FC = () => {
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-lg shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
             <select
@@ -144,6 +166,20 @@ const AdminNotes: React.FC = () => {
               {years.map((year) => (
                 <option key={year.id} value={year.id}>
                   {year.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Semester</label>
+            <select
+              value={selectedSemester}
+              onChange={(e) => setSelectedSemester(e.target.value as typeof selectedSemester)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+            >
+              {semesters.map((sem) => (
+                <option key={sem.id} value={sem.id}>
+                  {sem.name}
                 </option>
               ))}
             </select>
@@ -228,6 +264,85 @@ const AdminNotes: React.FC = () => {
                 ))}
               </select>
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Semester</label>
+              <select
+                value={formData.semester || selectedSemester}
+                onChange={(e) => setFormData({ ...formData, semester: e.target.value as typeof selectedSemester })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+              >
+                {semesters.map((sem) => (
+                  <option key={sem.id} value={sem.id}>
+                    {sem.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Document Scurce</label>
+              <div className="space-y-4">
+                {/* File Upload Option */}
+                <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <span className="block text-sm font-medium text-gray-900 mb-2">Option A: Upload File</span>
+                  <div className="flex items-center gap-4">
+                    <label className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                      <span>Choose File</span>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.zip"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            // Basic size check (e.g., 5MB limit)
+                            if (file.size > 5 * 1024 * 1024) {
+                              alert("File size too large. Please upload files smaller than 5MB.");
+                              return;
+                            }
+                            // Auto-set size if not set
+                            if (!formData.size) {
+                              const sizeMB = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+                              setFormData(prev => ({ ...prev, size: sizeMB }));
+                            }
+
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setFormData(prev => ({ ...prev, fileData: reader.result as string }));
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <span className="text-sm text-gray-500">
+                      {formData.fileData ? 'File attached' : 'No file selected'}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">Max size 5MB (localStorage limit)</p>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="px-2 bg-white text-sm text-gray-500">OR</span>
+                  </div>
+                </div>
+
+                {/* URL Option */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Option B: External URL</label>
+                  <input
+                    type="url"
+                    value={formData.url || ''}
+                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                    placeholder="https://example.com/file.pdf"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
           <div className="flex gap-3 mt-6">
             <button
@@ -252,7 +367,7 @@ const AdminNotes: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-200">
           <h3 className="font-semibold text-gray-900">
-            {categories.find(c => c.id === selectedCategory)?.name} - {years.find(y => y.id === selectedYear)?.name}
+            {categories.find(c => c.id === selectedCategory)?.name} - {years.find(y => y.id === selectedYear)?.name} - {semesters.find(s => s.id === selectedSemester)?.name}
             <span className="ml-2 text-sm text-gray-500">({currentNotes.length} notes)</span>
           </h3>
         </div>

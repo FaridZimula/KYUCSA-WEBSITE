@@ -65,7 +65,7 @@ const Chatbot = () => {
 
   const findBestMatch = (userInput: string): string => {
     const normalizedInput = userInput.toLowerCase().trim();
-    
+
     // Direct matches
     if (faqs[normalizedInput]) {
       return faqs[normalizedInput];
@@ -178,9 +178,8 @@ const Chatbot = () => {
       {/* Floating Action Button */}
       <button
         onClick={toggleChat}
-        className={`fixed bottom-6 right-6 z-50 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg p-4 transition-all duration-300 ${
-          isOpen ? 'scale-90' : 'scale-100 hover:scale-110'
-        }`}
+        className={`fixed bottom-24 right-6 z-50 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg p-4 transition-all duration-300 ${isOpen ? 'scale-90' : 'scale-100 hover:scale-110'
+          }`}
         aria-label="Open chatbot"
       >
         {isOpen ? (
@@ -193,11 +192,10 @@ const Chatbot = () => {
       {/* Chat Window */}
       {isOpen && (
         <div
-          className={`fixed bottom-24 right-6 z-50 bg-white rounded-xl shadow-2xl transition-all duration-300 ${
-            isMinimized
-              ? 'w-80 h-16'
-              : 'w-96 h-[600px]'
-          } flex flex-col`}
+          className={`fixed bottom-40 right-6 z-50 bg-white rounded-xl shadow-2xl transition-all duration-300 ${isMinimized
+            ? 'w-80 h-16'
+            : 'w-96 h-[600px]'
+            } flex flex-col`}
         >
           {/* Header */}
           <div className="bg-primary-500 text-white p-4 rounded-t-xl flex items-center justify-between">
@@ -239,9 +237,8 @@ const Chatbot = () => {
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex items-start space-x-3 ${
-                      message.sender === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
+                    className={`flex items-start space-x-3 ${message.sender === 'user' ? 'justify-end' : 'justify-start'
+                      }`}
                   >
                     {message.sender === 'bot' && (
                       <div className="bg-primary-100 p-2 rounded-full flex-shrink-0">
@@ -249,11 +246,10 @@ const Chatbot = () => {
                       </div>
                     )}
                     <div
-                      className={`max-w-[80%] rounded-lg p-3 ${
-                        message.sender === 'user'
-                          ? 'bg-primary-500 text-white'
-                          : 'bg-white text-gray-800 border border-gray-200'
-                      }`}
+                      className={`max-w-[80%] rounded-lg p-3 ${message.sender === 'user'
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-white text-gray-800 border border-gray-200'
+                        }`}
                     >
                       <p className="text-sm whitespace-pre-line">{message.text}</p>
                       <span className="text-xs opacity-70 mt-1 block">

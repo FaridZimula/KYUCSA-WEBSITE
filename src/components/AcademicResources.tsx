@@ -21,8 +21,8 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
     loadDocuments();
   }, []);
 
-  const loadDocuments = () => {
-    const data = notesManager.getAll();
+  const loadDocuments = async () => {
+    const data = await notesManager.getAll();
     setDocuments(data);
   };
 
@@ -53,7 +53,7 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
 
   const getFilteredDocuments = () => {
     let filteredDocs: Note[] = [];
-    
+
     if (selectedCategory === 'all') {
       if (selectedYear === 'all') {
         filteredDocs = getAllDocuments();
@@ -73,18 +73,18 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
         filteredDocs = documents[selectedCategory][selectedYear as 'year1' | 'year2' | 'year3'] || [];
       }
     }
-    
+
     if (searchTerm) {
-      filteredDocs = filteredDocs.filter(doc => 
+      filteredDocs = filteredDocs.filter(doc =>
         doc.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     return filteredDocs;
   };
 
   const filteredDocuments = getFilteredDocuments();
-  
+
   // Calculate category counts
   const categoryCounts = categories.map(cat => {
     if (cat.id === 'all') {
@@ -97,11 +97,37 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
     return { ...cat, count };
   });
 
+  const handleDownload = (doc: Note) => {
+    if (doc.fileData) {
+      // Handle Base64 download
+      const link = document.createElement('a');
+      link.href = doc.fileData;
+      link.download = doc.name; // Use the note name as filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (doc.url) {
+      // Handle External URL
+      window.open(doc.url, '_blank');
+    } else {
+      alert('No download available for this item.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Blue Header Section */}
-      <div className="bg-primary-500 text-white py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div className="bg-primary-500 text-white py-16 sm:py-20 relative overflow-hidden">
+        {/* Background Image Overlay */}
+        <div className="absolute inset-0">
+          <img
+            src="/Home Slide 3 (1).jpg"
+            alt="Background"
+            className="w-full h-full object-cover opacity-10"
+          />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">
             Academic Resources
           </h1>
@@ -162,11 +188,10 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.id)}
-                className={`px-3 sm:px-4 py-2 rounded-full font-medium transition-all duration-200 text-xs sm:text-sm ${
-                  selectedCategory === category.id
-                    ? 'bg-primary-500 text-white shadow-md'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
+                className={`px-3 sm:px-4 py-2 rounded-full font-medium transition-all duration-200 text-xs sm:text-sm ${selectedCategory === category.id
+                  ? 'bg-primary-500 text-white shadow-md'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
               >
                 {category.name} {category.id !== 'all' && `(${category.count})`}
               </button>
@@ -177,11 +202,10 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
               <button
                 key={year.id}
                 onClick={() => setSelectedYear(year.id)}
-                className={`px-3 sm:px-4 py-2 rounded-full font-medium transition-all duration-200 text-xs sm:text-sm ${
-                  selectedYear === year.id
-                    ? 'bg-secondary-500 text-white shadow-md'
-                    : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
-                }`}
+                className={`px-3 sm:px-4 py-2 rounded-full font-medium transition-all duration-200 text-xs sm:text-sm ${selectedYear === year.id
+                  ? 'bg-secondary-500 text-white shadow-md'
+                  : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-200'
+                  }`}
               >
                 {year.name}
               </button>
@@ -201,15 +225,18 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
                   {document.type}
                 </span>
               </div>
-              
+
               <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 line-clamp-2">{document.name}</h3>
-              
+
               <div className="flex justify-between items-center text-xs sm:text-sm text-gray-600 mb-4">
                 <span>Size: {document.size}</span>
                 <span>{document.downloads} downloads</span>
               </div>
-              
-              <button className="w-full bg-secondary-500 hover:bg-secondary-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm sm:text-base">
+
+              <button
+                onClick={() => handleDownload(document)}
+                className="w-full bg-secondary-500 hover:bg-secondary-600 text-white py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center text-sm sm:text-base"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Download
               </button>
@@ -233,13 +260,13 @@ const AcademicResources: React.FC<AcademicResourcesProps> = ({ setCurrentPage })
             Request specific notes or contribute your own study materials to help fellow students.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
+            <button
               onClick={() => setCurrentPage('contact')}
               className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition-colors duration-200 text-sm sm:text-base"
             >
               Request Notes
             </button>
-            <button 
+            <button
               onClick={() => setCurrentPage('contact')}
               className="border-2 border-white text-white hover:bg-white hover:text-primary-500 px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base"
             >

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Users, BookOpen, Trophy, Calendar } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Users, BookOpen, Trophy, Calendar } from 'lucide-react';
+import { partnersManager, presidentMessageManager, Partner, PresidentMessage } from '../utils/dataManager';
+import { seedPartners } from '../utils/seedPartnersData';
 
 interface HeroProps {
   setCurrentPage: (page: string) => void;
@@ -8,8 +10,27 @@ interface HeroProps {
 const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
   const [showFullMessage, setShowFullMessage] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [currentSessionSlide, setCurrentSessionSlide] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [presidentMessage, setPresidentMessage] = useState<PresidentMessage | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      let allPartners = await partnersManager.getAll();
+
+      // Auto-seed if empty
+      if (allPartners.length === 0) {
+        console.log('No partners found, seeding default data...');
+        await seedPartners(true);
+        allPartners = await partnersManager.getAll();
+      }
+
+      setPartners(allPartners.filter(p => p.category === 'home'));
+
+      const message = await presidentMessageManager.get();
+      setPresidentMessage(message);
+    };
+    loadData();
+  }, []);
 
   const sessionImages = [
     '/Home Slide 3 (1).jpg',
@@ -35,59 +56,6 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
     return () => clearInterval(interval);
   }, [backgroundImages.length]);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  useEffect(() => {
-    const sessionInterval = setInterval(() => {
-      setCurrentSessionSlide((prev) => {
-        // On mobile, show 2 images; on desktop, show 4 images
-        const maxSlide = isMobile 
-          ? Math.max(0, sessionImages.length - 2)
-          : Math.max(0, sessionImages.length - 4);
-        return prev >= maxSlide ? 0 : prev + 1;
-      });
-    }, 4000);
-
-    return () => clearInterval(sessionInterval);
-  }, [sessionImages.length, isMobile]);
-
-  const fullMessage = `Welcome to KYUCSA, where innovation meets opportunity. As your president, I'm excited to 
-  lead an organization that has consistently championed academic excellence and professional 
-  development in computing.
-
-  This year, we're committed to expanding our reach through enhanced digital resources, 
-  industry partnerships, and cutting-edge workshops that prepare you for the evolving 
-  tech landscape.
-
-  Together, we're not just building careers – we're shaping the future of technology 
-  in Uganda and beyond. Join us in this exciting journey of growth, learning, and innovation.
-
-  Our vision extends beyond the classroom walls. We believe in creating a community where every 
-  computing student can thrive, regardless of their background or current skill level. Through 
-  our comprehensive programs, mentorship opportunities, and industry connections, we're building 
-  bridges between academic theory and real-world application.
-
-  This semester, we're launching several new initiatives including our AI/ML research group, 
-  startup incubation program, and expanded internship placement services. We're also strengthening 
-  our partnerships with leading tech companies to provide more opportunities for our members.
-
-  I encourage every computing student to actively participate in KYUCSA activities. Whether you're 
-  interested in software development, cybersecurity, data science, or any other computing field, 
-  we have resources and opportunities tailored for you.
-
-  Let's make this academic year our most impactful yet. Together, we'll continue to elevate the 
-  standard of computing education at Kyambogo University and prepare ourselves for leadership 
-  roles in the global tech industry.`;
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section with Background Slideshow */}
@@ -97,9 +65,8 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
           {backgroundImages.map((image, index) => (
             <div
               key={index}
-              className={`absolute inset-0 transition-opacity duration-2000 ${
-                index === currentSlide ? 'opacity-10' : 'opacity-0'
-              }`}
+              className={`absolute inset-0 transition-opacity duration-2000 ${index === currentSlide ? 'opacity-10' : 'opacity-0'
+                }`}
               style={{
                 backgroundImage: `url(${image})`,
                 backgroundSize: 'cover',
@@ -109,21 +76,20 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
             />
           ))}
         </div>
-        
+
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[80vh] lg:min-h-[60vh]">
             <div className="text-center lg:text-left">
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold leading-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 Welcome to
                 <span className="block text-secondary-500">KYUCSA</span>
               </h1>
               <p className="text-lg sm:text-xl text-blue-100 mb-8 leading-relaxed">
-                Kyambogo University Computing Students Association - Your gateway to academic excellence, 
-                collaborative learning, and professional growth in the world of computing.
+                Kyambogo University Computing Students Association -A student association under the School Of Computing and Information Science that unites all computing students in Kyambogo University.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button 
+                <button
                   onClick={() => setCurrentPage('notes')}
                   className="bg-secondary-500 hover:bg-secondary-600 text-white px-6 sm:px-8 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center justify-center group"
                 >
@@ -135,25 +101,37 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
                 </button>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-              <div className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20">
-                <Users className="h-6 lg:h-8 w-6 lg:w-8 text-secondary-500 mb-4" />
+              <div
+                onClick={() => setCurrentPage('about')}
+                className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20 flex flex-col items-center text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
+              >
+                <Users className="h-8 lg:h-10 w-8 lg:w-10 text-secondary-500 mb-4 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-base lg:text-lg font-semibold mb-2">Active Community</h3>
                 <p className="text-sm lg:text-base text-blue-100">Connect with fellow computing students</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20">
-                <BookOpen className="h-6 lg:h-8 w-6 lg:w-8 text-secondary-500 mb-4" />
+              <div
+                onClick={() => setCurrentPage('notes')}
+                className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20 flex flex-col items-center text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
+              >
+                <BookOpen className="h-8 lg:h-10 w-8 lg:w-10 text-secondary-500 mb-4 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-base lg:text-lg font-semibold mb-2">Study Resources</h3>
                 <p className="text-sm lg:text-base text-blue-100">Access academic resources and question banks</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20">
-                <Trophy className="h-6 lg:h-8 w-6 lg:w-8 text-secondary-500 mb-4" />
+              <div
+                onClick={() => setCurrentPage('projects')}
+                className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20 flex flex-col items-center text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
+              >
+                <Trophy className="h-8 lg:h-10 w-8 lg:w-10 text-secondary-500 mb-4 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-base lg:text-lg font-semibold mb-2">Student Projects</h3>
                 <p className="text-sm lg:text-base text-blue-100">Showcase your amazing work</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20">
-                <Calendar className="h-6 lg:h-8 w-6 lg:w-8 text-secondary-500 mb-4" />
+              <div
+                onClick={() => setCurrentPage('sessions')}
+                className="bg-white/10 backdrop-blur-sm p-4 lg:p-6 rounded-xl border border-white/20 flex flex-col items-center text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group cursor-pointer"
+              >
+                <Calendar className="h-8 lg:h-10 w-8 lg:w-10 text-secondary-500 mb-4 group-hover:scale-110 transition-transform duration-300" />
                 <h3 className="text-base lg:text-lg font-semibold mb-2">Events & Sessions</h3>
                 <p className="text-sm lg:text-base text-blue-100">Stay updated with activities</p>
               </div>
@@ -174,36 +152,32 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
             </p>
           </div>
 
-          {/* Session Images Horizontal Slideshow */}
-          <div className="relative mb-8 sm:mb-12">
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ 
-                  transform: `translateX(-${currentSessionSlide * (isMobile ? 50 : 25)}%)` 
-                }}
-              >
-                {sessionImages.map((image, index) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 w-1/2 sm:w-1/4 px-2"
-                  >
-                    <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md">
-                      <img 
-                        src={image} 
-                        alt={`Session ${index + 1}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
+          {/* Session Images Horizontal Scroll */}
+          <div className="relative mb-8 sm:mb-12 group">
+            <div
+              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {sessionImages.map((image, index) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-full sm:w-1/3 px-2 snap-center"
+                >
+                  <div className="aspect-[4/3] rounded-lg overflow-hidden shadow-md">
+                    <img
+                      src={image}
+                      alt={`Session ${index + 1}`}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="text-center">
-            <button 
-              onClick={() => setCurrentPage('events')}
+            <button
+              onClick={() => setCurrentPage('sessions')}
               className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg font-semibold transition-colors duration-200"
             >
               View All Our Sessions
@@ -224,43 +198,36 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
             </p>
           </div>
 
-          {/* Infinite Scrolling Logo Carousel */}
-          <div className="relative">
-            <div className="overflow-hidden">
-              <div className="flex animate-scroll-slow">
-                {/* First set of logos */}
-                {[...Array(2)].map((_, setIndex) => (
-                  <div key={setIndex} className="flex flex-shrink-0">
-                    {[
-                      { name: 'Tech Company 1', logo: '/Hostel Connect logo.jpg' },
-                      { name: 'Tech Company 2', logo: '/FLAMIA LOGO.png' },
-                      { name: 'Tech Company 3', logo: '/Tamu Graphics.png' },
-                      { name: 'Tech Company 4', logo: '/Tamu Store Lopgo.png' },
-                      { name: 'Tech Company 5', logo: '/Tamu Web Logo 2.png' },
-                      { name: 'Tech Company 6', logo: '/KYU LOGO 3.png' },
-                      { name: 'Tech Company 3', logo: '/1719928495036.jpeg' },
-                      { name: 'Tech Company 4', logo: '/download (8).png' },
-                      { name: 'Tech Company 5', logo: '/download (39).jpeg' },
-                      { name: 'Tech Company 6', logo: '/Policy.jpg' },
-                    ].map((partner, index) => (
-                      <div
-                        key={`${setIndex}-${index}`}
-                        className="flex-shrink-0 mx-4 sm:mx-8 w-32 sm:w-40 lg:w-48 h-20 sm:h-24 lg:h-28"
-                      >
-                        <div className="w-full h-full bg-white rounded-lg shadow-md p-4 flex items-center justify-center border border-gray-200 hover:shadow-lg transition-shadow duration-300">
-                          <img
-                            src={partner.logo}
-                            alt={partner.name}
-                            className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                          />
-                        </div>
-                      </div>
-                    ))}
+          {/* Partners Carousel */}
+          <div className="relative group">
+            {partners.length > 0 ? (
+              <div
+                id="partners-carousel"
+                className="flex overflow-x-auto space-x-8 pb-8 pt-4 px-4 scrollbar-hide snap-x snap-mandatory"
+                style={{ scrollBehavior: 'smooth' }}
+              >
+                {partners.map((partner, index) => (
+                  <div
+                    key={partner.id || index}
+                    className="flex-shrink-0 w-32 sm:w-40 lg:w-48 h-20 sm:h-24 lg:h-28 snap-center"
+                  >
+                    <div className="w-full h-full bg-white rounded-lg shadow-md p-4 flex items-center justify-center border border-gray-200 hover:shadow-lg transition-transform hover:-translate-y-1 duration-300">
+                      <img
+                        src={partner.logo}
+                        alt={partner.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
-            </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>Our partners will be displayed here.</p>
+              </div>
+            )}
           </div>
+
         </div>
       </section>
 
@@ -270,50 +237,35 @@ const Hero: React.FC<HeroProps> = ({ setCurrentPage }) => {
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             {/* Image First on Mobile, Second on Desktop */}
             <div className="relative order-1 lg:order-2">
-              <img 
-                src="/PRESIDENT'S PHOTO.jpg" 
+              <img
+                src={presidentMessage?.image || "/PRESIDENT'S PHOTO.jpg"}
                 alt="KYUCSA President"
                 className="w-full max-w-xs mx-auto lg:max-w-sm rounded-xl shadow-lg"
               />
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 lg:left-4 lg:transform-none bg-primary-500 text-white px-3 sm:px-4 py-2 rounded-lg">
-                <p className="font-semibold text-sm sm:text-base">H.E ZIMULA FARID</p>
-                <p className="text-xs sm:text-sm">KYUCSA PRESIDENT</p>
+                <p className="font-semibold text-sm sm:text-base">{presidentMessage?.name || 'H.E. ZIMULA FARID'}</p>
+                <p className="text-xs sm:text-sm">{presidentMessage?.title || 'KYUCSA PRESIDENT'}</p>
               </div>
             </div>
-            
+
             {/* Text Second on Mobile, First on Desktop */}
             <div className="order-2 lg:order-1">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary-500 mb-6 text-center lg:text-left">
                 Message from President
               </h2>
               <div className="space-y-4 text-gray-700 leading-relaxed text-sm sm:text-base">
-                {showFullMessage ? (
-                  <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
-                    {fullMessage.split('\n\n').map((paragraph, index) => (
-                      <p key={index}>{paragraph.trim()}</p>
-                    ))}
-                  </div>
-                ) : (
-                  <>
-                    <p>
-                      Welcome to KYUCSA, where innovation meets opportunity. As your president, I'm excited to 
-                      lead an organization that has consistently championed academic excellence and professional 
-                      development in computing.
-                    </p>
-                    <p>
-                      This year, we're committed to expanding our reach through enhanced digital resources, 
-                      industry partnerships, and cutting-edge workshops that prepare you for the evolving 
-                      tech landscape.
-                    </p>
-                    <p>
-                      Together, we're not just building careers – we're shaping the future of technology 
-                      in Uganda and beyond. Join us in this exciting journey of growth, learning, and innovation.
-                    </p>
-                  </>
-                )}
+                <div className={`space-y-4 text-gray-700 leading-relaxed text-sm sm:text-base relative ${showFullMessage ? '' : 'max-h-[450px] overflow-hidden'}`}>
+                  {(presidentMessage?.message || '').split('\n\n').map((paragraph, index) => (
+                    <p key={index} className="mb-4">{paragraph.trim()}</p>
+                  ))}
+
+                  {!showFullMessage && (
+                    <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-gray-50 to-transparent pointer-events-none" />
+                  )}
+                </div>
               </div>
               <div className="mt-6 flex justify-center lg:justify-start">
-                <button 
+                <button
                   onClick={() => setShowFullMessage(!showFullMessage)}
                   className="bg-secondary-500 hover:bg-secondary-600 text-white px-4 sm:px-6 py-3 rounded-lg font-semibold transition-colors duration-200"
                 >

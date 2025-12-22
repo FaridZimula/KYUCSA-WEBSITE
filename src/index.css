@@ -20,3 +20,12 @@
     animation: scroll-slow 40s linear infinite;
   }
 }
+
+/* Hide Scrollbar Utilities */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
