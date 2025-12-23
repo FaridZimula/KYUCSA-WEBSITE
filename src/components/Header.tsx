@@ -103,8 +103,8 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
             onClick={() => handleNavClick('home')}
           >
             <img
-              src="/KYUCSA LOGO.png"
-              alt="KYUCSA Logo"
+              src="/kyucsa logo (2).png"
+              alt="/kyucsa logo (2).png"
               className="h-14 w-auto object-contain"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
