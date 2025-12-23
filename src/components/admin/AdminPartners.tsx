@@ -8,6 +8,8 @@ const AdminPartners: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'home' | 'corporate'>('home');
     const [editingPartner, setEditingPartner] = useState<Partner | null>(null);
     const [showForm, setShowForm] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [formData, setFormData] = useState<Partial<Partner>>({
         name: '',
         logo: '',
@@ -34,12 +36,14 @@ const AdminPartners: React.FC = () => {
             description: ''
         });
         setEditingPartner(null);
+        setSelectedFile(null);
         setShowForm(true);
     };
 
     const handleEdit = (partner: Partner) => {
         setFormData(partner);
         setEditingPartner(partner);
+        setSelectedFile(null);
         setShowForm(true);
     };
 
@@ -51,25 +55,43 @@ const AdminPartners: React.FC = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.name) return;
-
-        const partnerData: Partner = {
-            id: editingPartner?.id || Date.now(),
-            name: formData.name!,
-            logo: formData.logo || 'https://via.placeholder.com/150',
-            category: activeTab,
-            description: formData.description
-        };
-
-        if (editingPartner) {
-            await partnersManager.update(partnerData);
-        } else {
-            await partnersManager.add(partnerData);
+        if (!formData.name) {
+            alert("Please enter a partner name.");
+            return;
         }
+        setUploading(true);
 
-        await loadPartners();
-        setShowForm(false);
-        setEditingPartner(null);
+        try {
+            let logoUrl = formData.logo;
+
+            if (selectedFile) {
+                logoUrl = await partnersManager.uploadPartnerLogo(selectedFile);
+            }
+
+            const partnerData: Partner = {
+                id: editingPartner?.id || Date.now(),
+                name: formData.name!,
+                logo: logoUrl || 'https://via.placeholder.com/150',
+                category: activeTab,
+                description: formData.description
+            };
+
+            if (editingPartner) {
+                await partnersManager.update(partnerData);
+            } else {
+                await partnersManager.add(partnerData);
+            }
+
+            await loadPartners();
+            setShowForm(false);
+            setEditingPartner(null);
+            setSelectedFile(null);
+        } catch (error: any) {
+            console.error("Failed to save partner:", error);
+            alert(`Failed to save partner: ${error.message}`);
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -147,6 +169,8 @@ const AdminPartners: React.FC = () => {
                                     <input type="file" className="hidden" accept="image/*" onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
+                                            setSelectedFile(file);
+                                            // Preview
                                             const reader = new FileReader();
                                             reader.onloadend = () => setFormData({ ...formData, logo: reader.result as string });
                                             reader.readAsDataURL(file);
@@ -169,8 +193,10 @@ const AdminPartners: React.FC = () => {
                             </div>
                         )}
                         <div className="flex justify-end gap-3 mt-4">
-                            <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-                            <button onClick={handleSave} className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600">Save</button>
+                            <button onClick={() => setShowForm(false)} disabled={uploading} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                            <button onClick={handleSave} disabled={uploading} className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50">
+                                {uploading ? 'Uploading...' : 'Save'}
+                            </button>
                         </div>
                     </div>
                 </div>

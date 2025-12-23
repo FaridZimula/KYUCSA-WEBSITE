@@ -9,6 +9,8 @@ const AdminNotes: React.FC = () => {
   const [selectedSemester, setSelectedSemester] = useState<'semester1' | 'semester2'>('semester1');
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<Partial<Note>>({
     name: '',
     type: 'PDF',
@@ -60,12 +62,14 @@ const AdminNotes: React.FC = () => {
       semester: selectedSemester,
     });
     setEditingNote(null);
+    setSelectedFile(null);
     setShowForm(true);
   };
 
   const handleEdit = (note: Note) => {
     setFormData(note);
     setEditingNote(note);
+    setSelectedFile(null);
     setShowForm(true);
   };
 
@@ -87,20 +91,36 @@ const AdminNotes: React.FC = () => {
       return;
     }
 
-    const noteData: Note = {
-      id: editingNote?.id || Date.now(),
-      name: formData.name!,
-      type: formData.type || 'PDF',
-      size: formData.size!,
-      downloads: formData.downloads || 0,
-      category: formData.category || selectedCategory,
-      year: formData.year || selectedYear,
-      semester: formData.semester || selectedSemester,
-      url: formData.url,
-      fileData: formData.fileData,
-    };
-
+    setUploading(true);
     try {
+      let publicUrl = formData.url;
+
+      if (selectedFile) {
+        // Upload to storage
+        try {
+          // @ts-ignore - The method was just added
+          publicUrl = await notesManager.uploadNoteFile(selectedFile);
+        } catch (uploadErr: any) {
+          console.error("Upload failed", uploadErr);
+          alert(`File upload failed: ${uploadErr.message || "Unknown error"}. Please check your Supabase Storage Policies.`);
+          setUploading(false);
+          return;
+        }
+      }
+
+      const noteData: Note = {
+        id: editingNote?.id || Date.now(),
+        name: formData.name!,
+        type: formData.type || 'PDF',
+        size: formData.size!,
+        downloads: formData.downloads || 0,
+        category: formData.category || selectedCategory,
+        year: formData.year || selectedYear,
+        semester: formData.semester || selectedSemester,
+        url: publicUrl,
+        fileData: undefined, // We no longer use base64 for new uploads
+      };
+
       if (editingNote) {
         await notesManager.update(noteData);
       } else {
@@ -110,16 +130,20 @@ const AdminNotes: React.FC = () => {
       await loadNotes();
       setShowForm(false);
       setEditingNote(null);
+      setSelectedFile(null);
       setFormData({ name: '', type: 'PDF', size: '', downloads: 0 });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save note:", error);
-      alert("Failed to save note. If you are uploading a file, ensure it is within the database limits (usually < 1MB for direct storage) or try using a URL instead. Error details in console.");
+      alert(`Failed to save note to database: ${error.message || JSON.stringify(error)}`);
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleCancel = () => {
     setShowForm(false);
     setEditingNote(null);
+    setSelectedFile(null);
     setFormData({ name: '', type: 'PDF', size: '', downloads: 0 });
   };
 
@@ -190,8 +214,8 @@ const AdminNotes: React.FC = () => {
       {/* Add/Edit Form */}
       {showForm && (
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h3 className="text-lg font-semibold mb-4">
-            {editingNote ? 'Edit Note' : 'Add New Note'}
+          <h3 className="text-lg font-semibold mb-4 text-primary-600">
+            {editingNote ? 'Edit Note' : 'Add New Note (High Capacity Storage)'}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -294,31 +318,19 @@ const AdminNotes: React.FC = () => {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            // Basic size check (e.g., 5MB limit)
-                            if (file.size > 5 * 1024 * 1024) {
-                              alert("File size too large. Please upload files smaller than 5MB.");
-                              return;
-                            }
-                            // Auto-set size if not set
-                            if (!formData.size) {
-                              const sizeMB = (file.size / (1024 * 1024)).toFixed(2) + " MB";
-                              setFormData(prev => ({ ...prev, size: sizeMB }));
-                            }
-
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setFormData(prev => ({ ...prev, fileData: reader.result as string }));
-                            };
-                            reader.readAsDataURL(file);
+                            setSelectedFile(file);
+                            // Auto-set size if not set, or update it
+                            const sizeMB = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+                            setFormData(prev => ({ ...prev, size: sizeMB }));
                           }
                         }}
                       />
                     </label>
                     <span className="text-sm text-gray-500">
-                      {formData.fileData ? 'File attached' : 'No file selected'}
+                      {selectedFile ? selectedFile.name : (formData.url ? 'File existing (or URL set)' : 'No file selected')}
                     </span>
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">Max size 5MB (localStorage limit)</p>
+                  <p className="mt-1 text-xs text-gray-500">Files are uploaded to secure storage. No size limit checks applied.</p>
                 </div>
 
                 <div className="relative">
@@ -350,10 +362,11 @@ const AdminNotes: React.FC = () => {
               className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
             >
               <Save className="h-4 w-4" />
-              Save
+              {uploading ? 'Uploading...' : 'Save'}
             </button>
             <button
               onClick={handleCancel}
+              disabled={uploading}
               className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
             >
               <X className="h-4 w-4" />

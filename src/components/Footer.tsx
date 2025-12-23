@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code, Mail, MapPin, Twitter, Instagram, Linkedin, Youtube, ExternalLink, MessageCircle } from 'lucide-react';
+import { Mail, MapPin, Twitter, Instagram, Linkedin, Youtube, ExternalLink, MessageCircle } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -38,13 +38,14 @@ const Footer = () => {
 
           {/* Organization Info */}
           <div className="lg:col-span-1 text-center md:text-left">
-            <div className="flex items-center justify-center md:justify-start space-x-2 mb-4">
-              <div className="bg-secondary-500 p-2 rounded-lg">
-                <Code className="h-6 w-6 text-white" />
-              </div>
+            <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3 mb-4">
+              <img
+                src="/KYUCSA WHITE 1.png"
+                alt="KYUCSA Logo"
+                className="h-14 w-auto object-contain"
+              />
               <div>
-                <h3 className="text-xl font-bold">KYUCSA</h3>
-                <p className="text-sm text-blue-100">Computing Students Association</p>
+                <p className="text-sm text-blue-100">Kyambogo University Computing Students Association</p>
               </div>
             </div>
             <p className="text-blue-100 mb-6 leading-relaxed text-center md:text-left">

@@ -167,6 +167,30 @@ export const notesManager = {
     return result;
   },
 
+  uploadNoteFile: async (file: File): Promise<string> => {
+    // Generate a unique file name
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    // Upload to 'KYUCSA STORAGE' bucket (Exact name from Supabase Dashboard)
+    const { error: uploadError } = await supabase.storage
+      .from('KYUCSA STORAGE')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error uploading file:', uploadError);
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('KYUCSA STORAGE')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  },
+
   add: async (note: Note): Promise<void> => {
     const dbNote = {
       name: note.name,
@@ -175,9 +199,10 @@ export const notesManager = {
       downloads: note.downloads,
       category: note.category,
       year: note.year,
-      semester: note.semester, // Ensure this column exists or ignore if not needed
+      semester: note.semester,
       url: note.url,
-      file_data: note.fileData
+      // Only save file_data if specifically provided (legacy support), otherwise it's null
+      file_data: note.fileData || null
     };
     const { error } = await supabase.from('notes').insert([dbNote]);
     if (error) {
@@ -195,7 +220,7 @@ export const notesManager = {
       category: note.category,
       year: note.year,
       url: note.url,
-      file_data: note.fileData
+      file_data: note.fileData || null
     };
     const { error } = await supabase.from('notes').update(dbNote).eq('id', note.id);
     if (error) {
@@ -205,6 +230,8 @@ export const notesManager = {
   },
 
   delete: async (id: number): Promise<void> => {
+    // Note: Ideally we should also delete the file from storage if it exists there, 
+    // but we'll need the path for that. For now, we just delete the record.
     const { error } = await supabase.from('notes').delete().eq('id', id);
     if (error) {
       console.error('Error deleting note:', error);
@@ -509,6 +536,29 @@ export const partnersManager = {
     }));
   },
 
+  uploadPartnerLogo: async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `partner_${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    // Upload to 'KYUCSA STORAGE' bucket
+    const { error: uploadError } = await supabase.storage
+      .from('KYUCSA STORAGE')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error uploading partner logo:', uploadError);
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('KYUCSA STORAGE')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  },
+
   add: async (partner: Partner): Promise<void> => {
     const dbPartner = {
       name: partner.name,
@@ -516,7 +566,11 @@ export const partnersManager = {
       category: partner.category,
       description: partner.description
     };
-    await supabase.from('partners').insert([dbPartner]);
+    const { error } = await supabase.from('partners').insert([dbPartner]);
+    if (error) {
+      console.error('Error adding partner:', error);
+      throw error;
+    }
   },
 
   update: async (partner: Partner): Promise<void> => {
@@ -526,7 +580,11 @@ export const partnersManager = {
       category: partner.category,
       description: partner.description
     };
-    await supabase.from('partners').update(dbPartner).eq('id', partner.id);
+    const { error } = await supabase.from('partners').update(dbPartner).eq('id', partner.id);
+    if (error) {
+      console.error('Error updating partner:', error);
+      throw error;
+    }
   },
 
   delete: async (id: number): Promise<void> => {

@@ -20,6 +20,15 @@ import GeminiTest from './components/GeminiTest';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 7000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Sync with URL hash for direct navigation
   useEffect(() => {
@@ -119,6 +128,15 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {showSplash && (
+        <div className="fixed inset-0 bg-white z-[100] flex items-center justify-center transition-opacity duration-1000">
+          <img
+            src="/KYUCSA OPENING.png"
+            alt="KYUCSA Splash Logo"
+            className="w-64 h-auto object-contain animate-pulse"
+          />
+        </div>
+      )}
       {!isAdminPage && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />}
       <main className="min-h-screen">
         {renderPage()}

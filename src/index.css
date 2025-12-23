@@ -6,6 +6,7 @@
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -23,9 +24,18 @@
 
 /* Hide Scrollbar Utilities */
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
+
 .scrollbar-hide {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Linear Mask for scrolling areas */
+.mask-linear {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }

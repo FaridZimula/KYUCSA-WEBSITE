@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Menu, X, ChevronDown, Megaphone } from 'lucide-react';
+import { announcementsManager, Announcement } from '../utils/dataManager';
 
 interface HeaderProps {
   currentPage: string;
@@ -8,6 +9,15 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      const data = await announcementsManager.getAll();
+      setAnnouncements(data);
+    };
+    fetchAnnouncements();
+  }, []);
 
   const navItems = [
     { name: 'Home', id: 'home' },
@@ -49,12 +59,38 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
             <a href="https://kyu.ac.ug/scholarship/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-100 transition-colors">Scholarships</a>
           </div>
 
-          <button
-            onClick={() => setCurrentPage('announcements')}
-            className="bg-secondary-500 hover:bg-secondary-600 text-white text-xs sm:text-sm font-bold px-4 py-1.5 rounded-md transition-colors whitespace-nowrap shadow-sm ml-auto sm:ml-4"
-          >
-            Announcements
-          </button>
+
+          {/* Announcements Ticker */}
+          <div className={`w-full sm:w-auto flex-1 overflow-x-auto whitespace-nowrap scrollbar-hide flex items-center gap-6 sm:ml-4 px-2 ${announcements.length > 0 ? 'mask-linear' : ''} border-t sm:border-t-0 border-white/10 mt-1 sm:mt-0 pt-1 sm:pt-0`}>
+            {announcements.length > 0 ? (
+              announcements.map((announcement) => (
+                <a
+                  key={announcement.id}
+                  href={announcement.link || '#announcements'}
+                  onClick={(e) => {
+                    if (!announcement.link) {
+                      e.preventDefault();
+                      setCurrentPage('announcements');
+                    }
+                  }}
+                  target={announcement.link ? "_blank" : "_self"}
+                  rel="noopener noreferrer"
+                  className="text-xs sm:text-sm font-medium text-orange-100 hover:text-white transition-colors flex items-center gap-2"
+                >
+                  <Megaphone className="h-3 w-3 sm:h-4 sm:w-4 text-secondary-500 animate-pulse" />
+                  {announcement.title}
+                </a>
+              ))
+            ) : (
+              <button
+                onClick={() => setCurrentPage('announcements')}
+                className="bg-secondary-500 hover:bg-secondary-600 text-white text-xs sm:text-sm font-medium px-4 py-1.5 rounded-md flex items-center gap-2 mx-auto sm:mx-0 transition-colors shadow-sm"
+              >
+                <Megaphone className="h-4 w-4 text-white" />
+                View All Announcements
+              </button>
+            )}
+          </div>
 
 
         </div>
@@ -225,7 +261,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
           </div>
         )}
       </div>
-    </header>
+    </header >
   );
 };
 

@@ -46,15 +46,15 @@ const Announcements = () => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
                 {/* Category Filter */}
-                <div className="flex flex-wrap justify-center gap-2 mb-10">
+                <div className="flex flex-nowrap overflow-x-auto whitespace-nowrap scrollbar-hide gap-3 mb-10 pb-2 px-2 sm:justify-center">
                     {categories.map((cat) => (
                         <button
                             key={cat}
                             onClick={() => setFilter(cat)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 
+                            className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 flex-shrink-0
                                 ${filter === cat
-                                    ? 'bg-primary-500 text-white shadow-md'
-                                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'}`}
+                                    ? 'bg-primary-500 text-white shadow-md transform scale-105'
+                                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 hover:scale-105'}`}
                         >
                             {cat === 'Job Opportunity' ? 'Job Opportunities' : cat === 'Academic' ? 'Academics' : cat === 'Event' ? 'Events' : cat}
                         </button>
@@ -65,9 +65,9 @@ const Announcements = () => {
                 {loading ? (
                     <div className="text-center py-20 text-gray-500">Loading announcements...</div>
                 ) : filteredAnnouncements.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-xl shadow-sm border border-gray-100">
-                        <p className="text-lg font-medium text-gray-900 mb-2">No announcements found</p>
-                        <p className="text-sm sm:text-base text-gray-600">Try selecting a different category.</p>
+                    <div className="text-center py-20 bg-primary-500 rounded-xl shadow-sm border border-primary-400">
+                        <p className="text-lg font-medium text-white mb-2">No announcements found</p>
+                        <p className="text-sm sm:text-base text-blue-100">Try selecting a different category.</p>
                     </div>
                 ) : (
                     <div className="max-w-4xl mx-auto space-y-6">
